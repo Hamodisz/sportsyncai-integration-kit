@@ -62,6 +62,7 @@ Content-Type: application/json
 - `answers` — required, non-empty. Each entry is `question_key` and `answer_text` — both taken from `GET /api/v1/integrate/questions` above.
 - `language` — optional, `"en"` or `"ar"`. Defaults to `"en"`.
 - Maximum 50 answers per request. Maximum request size 20KB.
+- Rate limit: 30 requests per minute per API key.
 
 ## Response
 
