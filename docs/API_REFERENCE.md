@@ -1,6 +1,6 @@
 # Identity API — External Integration
 
-SportSyncAI is a closed-core service: the scoring methodology, internal taxonomy, and reasoning process are private. Partners integrate through this documented API surface only — two endpoints, described in full below. Nothing beyond what's documented here is ever exposed.
+Public developer integration documentation. SportSyncAI's core implementation and intelligence remain proprietary — the scoring methodology, internal taxonomy, and reasoning process are private. Developers integrate through this documented API surface only: two endpoints, described in full below. Nothing beyond what's documented here is ever exposed.
 
 `GET /api/v1/integrate/questions` · `POST /api/v1/integrate/identity`
 

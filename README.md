@@ -8,7 +8,7 @@
 
 ---
 
-This repository is **documentation and integration examples only** for SportSyncAI's Identity API — it is not source code for SportSyncAI itself, and SportSyncAI is not open source. The scoring methodology, internal taxonomy, and reasoning process are proprietary and stay on our servers. What's here is everything a partner needs to integrate: the API contract, a runnable example, and nothing else.
+This is **public developer integration documentation** for SportSyncAI's Identity API — not source code, and not an open-source release of SportSyncAI. **SportSyncAI's core implementation and intelligence remain proprietary.** What's here is everything a developer needs to integrate against the live HTTPS API: the contract, a runnable example, and nothing else.
 
 ## How it fits together
 
