@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300">
+  <defs>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#21D4ED"/>
+      <stop offset="100%" stop-color="#E38CFF"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="300" fill="#0A0A14"/>
+  <rect x="0" y="0" width="1200" height="6" fill="url(#edge)"/>
+
+  <text x="80" y="140" font-family="Helvetica, Arial, sans-serif" font-size="64" font-weight="700" fill="#F2F3F5">
+    SportSync<tspan fill="#21D4ED">AI</tspan>
+  </text>
+  <text x="80" y="182" font-family="Helvetica, Arial, sans-serif" font-size="24" fill="#9AA3AE">
+    Identity API — Partner Integration Kit
+  </text>
+
+  <g font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#C7CCD4">
+    <text x="80" y="230">Send structured answers</text>
+    <text x="330" y="230" fill="#21D4ED">→</text>
+    <text x="360" y="230">get a synthesized identity back</text>
+    <text x="80" y="258" fill="#6B7280">Closed-core: the methodology stays private — you receive the result, not the mechanism.</text>
+  </g>
+
+  <g transform="translate(950,60)" opacity="0.9">
+    <circle cx="0" cy="0" r="46" fill="none" stroke="#21D4ED" stroke-width="2" opacity="0.5"/>
+    <circle cx="0" cy="0" r="30" fill="none" stroke="#E38CFF" stroke-width="2" opacity="0.6"/>
+    <circle cx="0" cy="0" r="5" fill="#F2F3F5"/>
+  </g>
+</svg>
