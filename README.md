@@ -82,8 +82,14 @@ SPORTSYNCAI_API_KEY=<your key> python3 examples/example.py
 
 ## Getting a key
 
-API keys are issued individually — contact SportSyncAI to get one. Send it in the `X-API-Key` header; it identifies your integration, not a person, and is separate from any SportSyncAI end-user login.
+API keys are issued individually. **Email [partners@sportsyncai.site](mailto:partners@sportsyncai.site) to request one.**
+
+Send the key in the `X-API-Key` header; it identifies your integration, not a person, and is separate from any SportSyncAI end-user login.
 
 ## What you will never receive
 
 Per-answer scoring weights, the internal reasoning taxonomy, any trace of the reasoning process, internal record identifiers, or anything about SportSyncAI's architecture. The response you get back — category, identity, narrative — is the complete, final answer. There is no "more detail" endpoint, because there is nothing more to hand over.
+
+## Licensing
+
+No open-source license is granted. This repository is public developer documentation and integration examples; SportSyncAI's implementation and intelligence remain proprietary. The example code here is provided for building an integration against the documented API. Questions: [partners@sportsyncai.site](mailto:partners@sportsyncai.site).

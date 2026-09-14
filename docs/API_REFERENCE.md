@@ -42,7 +42,7 @@ The catalog currently returns 31 questions. Abbreviated response (real values, `
 
 ## Authentication
 
-Send your API key in the `X-API-Key` header. Keys are issued individually — contact SportSyncAI to get one.
+Send your API key in the `X-API-Key` header. Keys are issued individually — email **partners@sportsyncai.site** to request one.
 
 ```
 X-API-Key: ssai_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
