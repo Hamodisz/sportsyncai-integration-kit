@@ -16,22 +16,29 @@ Runs a set of answers through SportSyncAI's identity engine and returns a catego
 
 Returns the question set you can ask your own users, so you know which `question_key` and `answer_text` values are valid for the request below. Never includes scoring internals — only question and option text.
 
+The catalog currently returns 31 questions. Abbreviated response (real values, `q1` shown with all 5 of its options):
+
 ```json
 {
   "success": true,
   "questions": [
     {
       "key": "q1",
-      "question_en": "You're facing a challenge, and the reward is the same either way. Which do you choose?",
-      "question_ar": "قدامك تحدي، والجائزة نفس الشيء. أي تحدي تختار؟",
+      "question_en": "You've got a challenge in front of you, and the prize is the same no matter what you pick. Which one do you choose?",
+      "question_ar": "عندك تحدي قدامك، والجايزة نفسها مهما اخترت. أي تحدي بتختار؟",
       "options": [
-        {"text_en": "A mental puzzle — I beat it with thinking alone", "text_ar": "لغز أو تحدي ذهني — أتغلب عليه بالتفكير فقط"},
-        {"text_en": "A real, scary challenge — heights, speed, genuine danger", "text_ar": "تحدي حقيقي مخيف — مرتفعات، سرعة، خطر حقيقي"}
+        {"text_en": "A mental puzzle — I solve it just by thinking", "text_ar": "لغز أو تحدي ذهني، أحله بالتفكير بس"},
+        {"text_en": "A scary challenge, for real — heights, speed, real danger", "text_ar": "تحدي مخيف بصراحة — مرتفعات، سرعة، خطر حقيقي"},
+        {"text_en": "A physical challenge — body against body, strength and speed", "text_ar": "تحدي بدني — جسد ضد جسد، قوة وسرعة"},
+        {"text_en": "Whatever my friends pick — being together matters more", "text_ar": "اللي يختاره أصحابي — المهم نكون مع بعض"},
+        {"text_en": "Depends on the moment — sometimes I think it through, sometimes I want the real thrill", "text_ar": "يعتمد على الموقف، أحياناً أفكر وأحياناً أبي إثارة حقيقية"}
       ]
     }
   ]
 }
 ```
+
+**`answer_text` must match an option's text exactly** as returned by this endpoint. Don't retype or paraphrase it — copy the string through from the catalog response, or you'll get `unrecognized_answers`. Always fetch the catalog rather than hardcoding these values; the wording can change.
 
 ## Authentication
 
@@ -52,8 +59,8 @@ Content-Type: application/json
 
 {
   "answers": [
-    {"question_key": "q1", "answer_text": "A real, scary challenge — heights, speed, genuine danger"},
-    {"question_key": "q2", "answer_text": "With friends"}
+    {"question_key": "q1", "answer_text": "A scary challenge, for real — heights, speed, real danger"},
+    {"question_key": "q2", "answer_text": "Deep in thought, solving a problem no one else could figure out"}
   ],
   "language": "en"
 }
@@ -87,6 +94,8 @@ There is no confidence score in this version — we'd rather omit one than retur
 
 All errors return `{"success": false, "error": "<code>"}` with an appropriate HTTP status.
 
+Checks run in this order: **API key → rate limit → request size → JSON parsing → answer validation.** The first failure is what you get back — so a request with both a bad key and a malformed body returns `401 invalid_api_key`, not `400 invalid_json`. Fix authentication first when debugging.
+
 | Status | `error` | Meaning |
 |---|---|---|
 | 401 | `invalid_api_key` | Missing, wrong, or deactivated API key |
@@ -100,13 +109,21 @@ All errors return `{"success": false, "error": "<code>"}` with an appropriate HT
 
 ## Minimal example
 
+Fetch the catalog (no key needed):
+
+```bash
+curl https://sportsyncai.site/api/v1/integrate/questions
+```
+
+Then send an answer (`answer_text` copied exactly from that response):
+
 ```bash
 curl -X POST https://sportsyncai.site/api/v1/integrate/identity \
   -H "X-API-Key: ssai_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
     "answers": [
-      {"question_key": "q1", "answer_text": "A real, scary challenge — heights, speed, genuine danger"}
+      {"question_key": "q1", "answer_text": "A scary challenge, for real — heights, speed, real danger"}
     ],
     "language": "en"
   }'
