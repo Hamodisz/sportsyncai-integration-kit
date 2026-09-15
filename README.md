@@ -10,6 +10,8 @@
 
 This is **public developer integration documentation** for SportSyncAI's Identity API — not source code, and not an open-source release of SportSyncAI. **SportSyncAI's core implementation and intelligence remain proprietary.** What's here is everything a developer needs to integrate against the live HTTPS API: the contract, a runnable example, and nothing else.
 
+**New to this?** Start with **[What the Identity API enables](docs/WHAT_IT_ENABLES.md)** — what it does for your product, what you're not taking on, and where its limits honestly are. Then come back here for the integration.
+
 ## How it fits together
 
 ```mermaid
@@ -75,6 +77,7 @@ SPORTSYNCAI_API_KEY=<your key> python3 examples/example.py
 
 | Path | Purpose |
 |---|---|
+| `docs/WHAT_IT_ENABLES.md` | What integrating this does for your business, what you don't have to build, and what it deliberately doesn't do. |
 | `docs/API_REFERENCE.md` | The complete contract — every field, every error code, request-size limits, rate limits. |
 | `examples/example.py` | The entire integration in ~50 lines. Calls the two real endpoints over HTTPS. Read it end to end; it's short on purpose. |
 | `examples/Dockerfile` | Wraps `example.py` so it runs identically on any OS with zero local setup. |
