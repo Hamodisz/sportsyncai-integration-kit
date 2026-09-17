@@ -79,6 +79,7 @@ SPORTSYNCAI_API_KEY=<your key> python3 examples/example.py
 |---|---|
 | `docs/WHAT_IT_ENABLES.md` | What integrating this does for your business, what you don't have to build, and what it deliberately doesn't do. |
 | `docs/API_REFERENCE.md` | The complete contract — every field, every error code, request-size limits, rate limits. |
+| `docs/ROADMAP.md` | Where this is headed beyond identity — a direction, not a live capability. |
 | `examples/example.py` | The entire integration in ~50 lines. Calls the two real endpoints over HTTPS. Read it end to end; it's short on purpose. |
 | `examples/Dockerfile` | Wraps `example.py` so it runs identically on any OS with zero local setup. |
 | `assets/banner.svg` | This page's banner. |
