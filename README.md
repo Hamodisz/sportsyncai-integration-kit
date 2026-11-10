@@ -6,6 +6,11 @@
   <b>Send structured answers about a person. Get back a synthesized identity read. Nothing else.</b>
 </p>
 
+<p align="center">
+  <b>Full guide, in English and Arabic: <a href="https://sportsyncai.site/developers">sportsyncai.site/developers</a></b><br>
+  Get an API key: <a href="https://sportsyncai.site/partner-onboarding.html">sportsyncai.site/partner-onboarding.html</a>
+</p>
+
 ---
 
 This is **public developer integration documentation** for SportSyncAI's Identity API — not source code, and not an open-source release of SportSyncAI. **SportSyncAI's core implementation and intelligence remain proprietary.** What's here is everything a developer needs to integrate against the live HTTPS API: the contract, a runnable example, and nothing else.
@@ -45,7 +50,7 @@ That's it. The container calls the real, live, hosted API — the exact same two
 
 ```
 1. Fetching the question catalog from https://sportsyncai.site ...
-   Got 31 questions.
+   Got 34 questions.
    Using: "You've got a challenge in front of you, and the prize is the same
            no matter what you pick. Which one do you choose?"
    Answering: "A mental puzzle — I solve it just by thinking"
@@ -86,7 +91,9 @@ SPORTSYNCAI_API_KEY=<your key> python3 examples/example.py
 
 ## Getting a key
 
-API keys are issued individually. **Email [partners@sportsyncai.site](mailto:partners@sportsyncai.site) to request one.**
+API keys are issued individually. **Request one through the [onboarding form](https://sportsyncai.site/partner-onboarding.html)**, or email [partners@sportsyncai.site](mailto:partners@sportsyncai.site). We review every request and send you a key that starts with `ssai_`.
+
+You can check the API is live before you have a key: open [the question list](https://sportsyncai.site/api/v1/integrate/questions) in your browser. It returns `"success": true` and every question.
 
 Send the key in the `X-API-Key` header; it identifies your integration, not a person, and is separate from any SportSyncAI end-user login.
 

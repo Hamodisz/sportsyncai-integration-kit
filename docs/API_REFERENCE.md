@@ -16,7 +16,7 @@ Runs a set of answers through SportSyncAI's identity engine and returns a catego
 
 Returns the question set you can ask your own users, so you know which `question_key` and `answer_text` values are valid for the request below. Never includes scoring internals — only question and option text.
 
-The catalog currently returns 31 questions. Abbreviated response (real values, `q1` shown with all 5 of its options):
+The catalog currently returns 34 questions. Full guide: [sportsyncai.site/developers](https://sportsyncai.site/developers). Abbreviated response (real values, `q1` shown with all 5 of its options):
 
 ```json
 {
