@@ -29,8 +29,8 @@ specific person stays in.**
 
 ## What you can build with it
 
-Each of these uses only what the API already returns — `category`,
-`category_secondary`, `identity`, `narrative`.
+Each of these uses only what the identity system returns — `category`,
+`category_secondary`, `identity`, `narrative`. Body reading, sport map, places and people are listed in the [API reference](API_REFERENCE.md).
 
 ### Onboarding that isn't cold
 A new signup is an anonymous row until they do something. Ask a handful of
@@ -68,9 +68,11 @@ This matters as much as the capability:
 - **No ML team, no data pipeline, no model to maintain.** One HTTPS call. The
   methodology stays on our side and improves without you redeploying anything.
 - **No hardware or app-architecture change.** It's a request and a response.
-- **No data custody burden from us.** The identity endpoint is stateless — it
-  creates no account, stores no end-user record, and returns no identifier that
-  tracks a person. Your users stay yours.
+- **Data we keep, stated plainly.** Calls without a `user_id` are not stored.
+  When you send a `user_id`, we keep that user's answers and watch days under
+  your account (up to 365 days), so each read builds on the last and people
+  matching works. One `DELETE /api/v1/integrate/users/{user_id}` erases all of
+  it. Send only users who agreed to this in your own terms.
 - **No lock-in through your data.** You keep every input you collected and every
   result you received.
 
@@ -83,11 +85,10 @@ them rather than discover them mid-integration:
 
 | Not included | What that means for you |
 |---|---|
-| Wearable / health-platform ingestion | The API reads the answers you send. It does not connect to a device stream. |
-| Booking or transactions | It returns an identity. Acting on it happens in your product. |
+| A live device connection | Body reading uses the daily watch data you send. It does not connect to a device stream itself. |
+| Booking or transactions | Places returns venues and groups without contacts; booking happens on sportsyncai.site or in your product. |
 | A learning loop from your outcomes | Results do not currently get better from the outcomes your users produce. |
 | User accounts or auth for your users | Your API key identifies *your integration*, never an individual person. |
-| Venue or facility data | Not part of this endpoint. |
 
 If a roadmap item above is the reason you're evaluating this, say so when you
 request a key — it's a different conversation, and a more useful one than

@@ -1,7 +1,6 @@
 # Beyond identity: the compatibility direction
 
-**Everything on this page is a direction, not a capability.** Nothing described
-here can be called today. This page exists so a partner evaluating the
+**Places and People are now live systems** — see the [API reference](API_REFERENCE.md). Experiences is still a direction, not a capability. This page exists so a partner evaluating the
 [Identity API](API_REFERENCE.md) can see where the underlying signal is headed
 and plan accordingly — the same reason [What the Identity API
 enables](WHAT_IT_ENABLES.md) publishes its "honest boundaries" table instead of
@@ -41,9 +40,9 @@ promise of a date.
 
 | Direction | Status today | What that means for you |
 |---|---|---|
-| **Places** — venues, groups, communities | Runs live inside SportSyncAI's own product (**Communities**, at sportsyncai.site) for our own users. Not exposed through this API or any partner-facing endpoint. | The matching itself is real and running today, not hypothetical — but there is nothing here to integrate against yet. |
-| **People** — training partners, collaborators, networking | Concept stage. Does not exist in our own product either. | Nothing built, nothing to plan around yet beyond the fact that we're evaluating it. |
-| **Experiences** — events, activities, adventures | Concept stage. Does not exist in our own product either. | Same as People — named here for completeness, not availability. |
+| **Places** — venues, groups, communities | Live: `GET /api/v1/integrate/places`. | Real venues and groups for a sport in a city, without contacts. |
+| **People** — training partners | Live: `/api/v1/integrate/people/…`, within your own users, same gender only, opt-in per user. | Your users who agreed to be matched can find each other. |
+| **Experiences** — events, activities, adventures | Concept stage. | Named here for completeness, not availability. |
 
 ---
 
@@ -53,9 +52,8 @@ Worth stating plainly, because it changes what "done" would even mean: matching
 a person to a venue or an event only requires their consent. Matching a person
 to *another person* requires both sides to agree before either one is
 revealed to the other — otherwise it isn't matching, it's one person being
-served up to a stranger without a say in it. Any future version of the People
-direction would need that mutual-consent step as a first-class part of it, not
-an afterthought. Mentioned here so it's clear this isn't being treated as a
+served up to a stranger without a say in it. In the live People system, a user is only shown when you set `matching: true`
+for them — set it only for users who agreed — and either side can block the other. Mentioned here so it's clear this isn't being treated as a
 smaller version of the same problem.
 
 ---

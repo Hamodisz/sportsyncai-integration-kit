@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <b>Send structured answers about a person. Get back a synthesized identity read. Nothing else.</b>
+  <b>Hosted systems you call over HTTPS. You send your user's answers or watch data; the system sends back its read. You never get our code.</b>
 </p>
 
 <p align="center">
@@ -13,28 +13,41 @@
 
 ---
 
-This is **public developer integration documentation** for SportSyncAI's Identity API — not source code, and not an open-source release of SportSyncAI. **SportSyncAI's core implementation and intelligence remain proprietary.** What's here is everything a developer needs to integrate against the live HTTPS API: the contract, a runnable example, and nothing else.
+This is **public developer integration documentation** for SportSyncAI's partner API — not source code, and not an open-source release of SportSyncAI. **SportSyncAI's core implementation and intelligence remain proprietary.** What's here is everything a developer needs to integrate against the live HTTPS API: the contract, a runnable example, and nothing else.
 
 **New to this?** Start with **[What the Identity API enables](docs/WHAT_IT_ENABLES.md)** — what it does for your product, what you're not taking on, and where its limits honestly are. Then come back here for the integration.
 
-## How it fits together
+## The systems
+
+Each row is one hosted system. This page names what each one takes in and what kind of answer it gives — the full contract is in [docs/API_REFERENCE.md](docs/API_REFERENCE.md).
+
+| System | Endpoint | You send | You get back |
+|---|---|---|---|
+| Question catalog | `GET /api/v1/integrate/questions` | nothing (no key needed) | the questions and option text to ask your users |
+| Identity | `POST /api/v1/integrate/identity` | the user's answers | a category, an identity name and a short narrative |
+| Body reading | `POST /api/v1/integrate/body-reading` | up to 14 days of the user's watch data | how the user lives, in words, how sure the read is, and where the body disagrees with the answers |
+| Sport map | `POST /api/v1/integrate/sport-map` | answers and/or watch days | up to three sports, one per world, that run on the same drivers — a map, not a ranking |
+| Places | `GET /api/v1/integrate/places` | a sport and a city | real venues and groups for that sport in that city, without contact details |
+| People | `PUT /api/v1/integrate/people/{user_id}` · `GET …/matches` · `POST …/block/{other_id}` | the user's profile and consent to be matched | other users **of yours**, same gender only, who play alike |
+| Delete a user | `DELETE /api/v1/integrate/users/{user_id}` | a user id | everything stored for that user is erased |
+| Usage | `GET /api/v1/integrate/usage` | a month | your successful calls per system for that month |
 
 ```mermaid
 sequenceDiagram
     participant P as Your Platform
     participant S as SportSyncAI (closed-core)
 
-    P->>S: GET /api/v1/integrate/questions
-    S-->>P: question + option text (no scoring internals)
-
-    P->>S: POST /api/v1/integrate/identity<br/>{ X-API-Key, answers }
-    Note over S: Private: scoring weights,<br/>reasoning taxonomy, internal architecture
-    S-->>P: { category, identity, narrative }
-
-    P->>P: use the result in your own product
+    P->>S: answers / watch days / sport + city<br/>{ X-API-Key }
+    Note over S: Private: scoring, reasoning,<br/>matching, internal architecture
+    S-->>P: the system's read
+    P->>P: use it in your own product
 ```
 
-Everything inside the "SportSyncAI" box in that diagram is private. Everything crossing the arrows is the entire integration surface — there is nothing else.
+Everything inside the "SportSyncAI" box is private. Everything crossing the arrows is the whole integration surface.
+
+**How you pay:** per successful call (HTTP 200), per system. Errors are not counted. `usage` and `delete` are free. Prices are agreed per partner.
+
+**What we keep:** when you send a `user_id`, we keep that user's answers and watch days under your account (up to 365 days) so each read builds on the last. One `DELETE` erases all of it. Send only users who agreed to this in your own terms.
 
 ## Quickstart — run the real example, on any device
 
@@ -46,29 +59,8 @@ docker build -t sportsyncai-example .
 docker run --rm -e SPORTSYNCAI_API_KEY=<your key> sportsyncai-example
 ```
 
-That's it. The container calls the real, live, hosted API — the exact same two endpoints your own integration will use — and prints the result:
+That's it. The container calls the real, live, hosted API — the question catalog and the identity system — and prints whatever the system answers for that one sample answer.
 
-```
-1. Fetching the question catalog from https://sportsyncai.site ...
-   Got 34 questions.
-   Using: "You've got a challenge in front of you, and the prize is the same
-           no matter what you pick. Which one do you choose?"
-   Answering: "A mental puzzle — I solve it just by thinking"
-
-2. Sending the answer to POST /api/v1/integrate/identity ...
-   HTTP 200
-
-{
-  "success": true,
-  "category": "mental",
-  "category_secondary": null,
-  "identity": "The Strategist",
-  "narrative": "You win in your head before your body moves. The real
-                game is the one no one else can see."
-}
-```
-
-*(This is a real, live run of this exact example against production — not a mockup.)*
 
 ### Without Docker
 
@@ -82,10 +74,10 @@ SPORTSYNCAI_API_KEY=<your key> python3 examples/example.py
 
 | Path | Purpose |
 |---|---|
-| `docs/WHAT_IT_ENABLES.md` | What integrating this does for your business, what you don't have to build, and what it deliberately doesn't do. |
+| `docs/WHAT_IT_ENABLES.md` | What integrating these systems does for your business, what you don't have to build, and what they deliberately don't do. |
 | `docs/API_REFERENCE.md` | The complete contract — every field, every error code, request-size limits, rate limits. |
-| `docs/ROADMAP.md` | Where this is headed beyond identity — a direction, not a live capability. |
-| `examples/example.py` | The entire integration in ~50 lines. Calls the two real endpoints over HTTPS. Read it end to end; it's short on purpose. |
+| `docs/ROADMAP.md` | What is live and what is still a direction. |
+| `examples/example.py` | The identity integration in ~50 lines. Calls the catalog and identity systems over HTTPS. Read it end to end; it's short on purpose. |
 | `examples/Dockerfile` | Wraps `example.py` so it runs identically on any OS with zero local setup. |
 | `assets/banner.svg` | This page's banner. |
 
@@ -99,7 +91,7 @@ Send the key in the `X-API-Key` header; it identifies your integration, not a pe
 
 ## What you will never receive
 
-Per-answer scoring weights, the internal reasoning taxonomy, any trace of the reasoning process, internal record identifiers, or anything about SportSyncAI's architecture. The response you get back — category, identity, narrative — is the complete, final answer. There is no "more detail" endpoint, because there is nothing more to hand over.
+Code of any kind, per-answer scoring weights, the internal reasoning taxonomy, trait numbers, any trace of the reasoning process, internal record identifiers, other partners' users, our own users, venue contact details, or anything about SportSyncAI's architecture. Each system's answer is the complete, final answer.
 
 ## Licensing
 

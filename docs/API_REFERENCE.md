@@ -1,14 +1,10 @@
-# Identity API — External Integration
+# Partner API — Reference
 
-Public developer integration documentation. SportSyncAI's core implementation and intelligence remain proprietary — the scoring methodology, internal taxonomy, and reasoning process are private. Developers integrate through this documented API surface only: two endpoints, described in full below. Nothing beyond what's documented here is ever exposed.
+Public developer integration documentation. SportSyncAI's core implementation and intelligence remain proprietary — the scoring methodology, internal taxonomy, and reasoning process are private. Developers integrate through this documented API surface only: the systems described in full below. Nothing beyond what's documented here is ever exposed.
 
-`GET /api/v1/integrate/questions` · `POST /api/v1/integrate/identity`
+Systems: question catalog · identity · body reading · sport map · places · people · delete a user · usage.
 
-Send structured answers about a person. Get back a synthesized identity read. Nothing else.
-
-## What it does
-
-Runs a set of answers through SportSyncAI's identity engine and returns a category, an identity label, and a short narrative. You receive the result, not the mechanism.
+Each system takes your user's data in and gives back its read. You receive the read, not the mechanism, and never any code.
 
 ## Question catalog
 
@@ -68,20 +64,13 @@ Content-Type: application/json
 
 - `answers` — required, non-empty. Each entry is `question_key` and `answer_text` — both taken from `GET /api/v1/integrate/questions` above.
 - `language` — optional, `"en"` or `"ar"`. Defaults to `"en"`.
+- `user_id` — optional. Your own id for this user (letters, digits, `_`, `-`, up to 64). When sent, we keep the answers under your account so body reading, sport map and people can use them without you sending them again. Never send an email or phone number as the id (`400 invalid_user_id`).
 - Maximum 50 answers per request. Maximum request size 20KB.
 - Rate limit: 30 requests per minute per API key.
 
 ## Response
 
-```json
-{
-  "success": true,
-  "category": "adrenaline",
-  "category_secondary": null,
-  "identity": "The Edge-Seeker",
-  "narrative": "Calm bores you. You come alive at the edge — where the stakes are real and most people step back."
-}
-```
+`{"success": true, "category", "category_secondary", "identity", "narrative"}`
 
 - `category` — one of `physical`, `adrenaline`, `mental`.
 - `category_secondary` — a second category if the read is a genuine blend, otherwise `null`.
@@ -128,3 +117,84 @@ curl -X POST https://sportsyncai.site/api/v1/integrate/identity \
     "language": "en"
   }'
 ```
+
+
+---
+
+# The other systems
+
+Same rules as identity: `X-API-Key` on every call, the same rate limit (30 requests per minute per key, shared across all systems), and errors as `{"success": false, "error": "<code>"}`. The days-based systems accept bodies up to 1 MB; everything else 20KB.
+
+`user_id` is your own id for the user: letters, digits, `_` and `-`, up to 64 characters. Data is kept per partner — the same `user_id` sent by two partners is two different people.
+
+## Watch days (input format)
+
+Used by body reading, sport map and people. Up to 14 days per call; each date once. Days you sent before are kept (up to 365 days) and the newest 14 are read together.
+
+| Field | Required | Meaning |
+|---|---|---|
+| `date` | yes | `YYYY-MM-DD` |
+| `sleep` | no | hours slept, 0–24 |
+| `sleep_mid_min` | no | minutes from the previous noon to the middle of the night's sleep, 0–1440 |
+| `move_center_min` | no | the step-weighted minute of the day the user moved (minutes from midnight), 0–1440 |
+| `resting_hr` | no | resting heart rate, 20–250 |
+| `steps` | no | steps that day, 0–200000 |
+| `context` | no | what kind of day it was: `work`, `off_day`, `personal`, `physical`, `excitement`, `sick`, `private`. `personal`, `sick` and `private` days are left out of the read. |
+| `hr_by_minute` | no | up to 1440 heart-rate values, one per minute from midnight (`null` for no reading) |
+| `steps_by_minute` | no | up to 1440 step counts, one per minute from midnight |
+
+Day errors (400): `missing_days`, `too_many_days`, `malformed_days`, `invalid_user_id`.
+
+## Body reading
+
+`POST /api/v1/integrate/body-reading` — body `{"user_id", "days", "answers"?, "language"?}`
+
+Reads how the user actually lives from the watch, in words.
+
+Response fields:
+- `ready` — whether there is enough data for a read.
+- `days_used` — how many days went into the read.
+- `confidence` — `initial`, `early`, `building`, `solid`, or `null`.
+- `traits` — list of `{trait, lean}`: the trait name and which way this user leans, in words.
+- `facts` — the middle value of your own data: `resting_hr`, `sleep_hours`, `steps`, `sleep_midpoint`.
+- `disagrees_with_answers` — only when answers are known: the traits where the body says something different from the answers.
+
+## Sport map
+
+`POST /api/v1/integrate/sport-map` — body `{"user_id", "answers"?, "days"?, "language"?}`
+
+Maps the user to up to three sports — one per world — that run on the same drivers. It is a map, not a ranking: the entry with `"yours": true` is the user's own world, the others are other doors into the same room.
+
+Response fields: `world`, `map` (list of `{world, sport, yours}`), `based_on` (`answers`, `watch`). When there is not enough to map, `map` is empty and `reason` is `need_answers_or_more_traits`.
+
+Errors: `400 missing_input` (no answers and no days, sent or stored).
+
+## Places
+
+`GET /api/v1/integrate/places?sport=<sport>&city=<city>&language=en|ar`
+
+Real venues and groups for one sport in one city, from SportSyncAI's own places data.
+
+Response fields: `sport`, `city`, `count`, `places` (each: `kind` (`venue` or `community`), `id`, `name`, `sport`, `district`, `rating`, `rating_count`, `gender_category`, `world`, and `beginner_friendly` for groups), `browse_url` (where your user can see contacts and booking on sportsyncai.site). Contact details, booking links and coordinates are never returned.
+
+Errors: `400 missing_sport_or_city`, `400 unknown_sport`, `400 unknown_city`, `503 places_unavailable` (with `"retryable": true` — try again later; not counted).
+
+## People
+
+Matches **your own users** with each other. Never with another partner's users, never with SportSyncAI's own users. **Men are matched only with men and women only with women** — enforced on our side; a user with no gender is never matched.
+
+- `PUT /api/v1/integrate/people/{user_id}` — body `{"gender": "male"|"female", "matching": true|false, "answers"?, "days"?, "interests"? (up to 10, 30 characters each), "city"? (40 characters)}`. Set `matching: true` only for users who agreed to be shown to other users. Response: `user_id`, `matching`, `world`, `sports`. Errors: `400 invalid_gender`, `400 gender_required` (matching on without a gender).
+- `GET /api/v1/integrate/people/{user_id}/matches` — up to 30 users. Each: `user_id`, `world`, `sports`, `interests`, `city`, `in_common`, `plays_alike` (one line, in words). Trait values are never returned. Errors: `404 not_found`, `400 matching_off`.
+- `POST /api/v1/integrate/people/{user_id}/block/{other_id}` — the two never see each other again. Response: `user_id`, `blocked`.
+
+## Delete a user
+
+`DELETE /api/v1/integrate/users/{user_id}` — erases every answer, watch day, people profile and block stored for that user under your account. Response: `user_id`, `deleted`. Free.
+
+## Usage
+
+`GET /api/v1/integrate/usage?month=YYYYMM` (defaults to this month, UTC) — your successful calls per system: `month`, `calls` (per system), `total_calls`, `price_per_call_usd`, `amount_usd`. Free. Error: `400 invalid_month`.
+
+## Billing
+
+Each successful call (HTTP 200) to identity, body reading, sport map, places or people is counted once. Errors, `usage` and `delete` are not counted. Prices are agreed per partner; until yours are set, `price_per_call_usd` is `"not_set"` and `amount_usd` is `null`.
